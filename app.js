@@ -259,12 +259,29 @@ function cheerBanner(c) {
     </div>`;
 }
 
-// Sits in the empty space left of the scoreboard on wide screens, below it otherwise.
-const ENEMY_HTML = `
-  <figure class="enemy">
-    <figcaption>Also an enemy of the league</figcaption>
-    <img src="patrick-gm.jpg" alt="Patrick Siegmund, General Manager of the St. Louis Stallions" width="1122" height="1402" loading="lazy">
-  </figure>`;
+// Picture columns that sit in the empty space either side of the scoreboard on wide screens, below it otherwise.
+const GALLERY_HTML = `
+  <aside class="gallery left">
+    <figure class="enemy">
+      <figcaption>Mr Never had an injury himself</figcaption>
+      <img src="dan-lucky.jpg" alt="Dan holding a silver toilet trophy in a Luckiest Fantasy Player Alive shirt" width="1024" height="1536" loading="lazy">
+    </figure>
+    <figure class="enemy">
+      <figcaption>Also an enemy of the league</figcaption>
+      <img src="patrick-gm.jpg" alt="Patrick Siegmund, General Manager of the St. Louis Stallions" width="1122" height="1402" loading="lazy">
+    </figure>
+  </aside>
+  <aside class="gallery right">
+    <figure class="enemy goal">
+      <figcaption>The Goal</figcaption>
+      <img src="sadboy.jpg" alt="Dan crying" width="1170" height="1543" loading="lazy">
+    </figure>
+    <figure class="enemy punish">
+      <figcaption>Never forget the punishments undone</figcaption>
+      <img src="floormat-web.jpg" alt="Doormat reading I suck at fantasy football" width="900" height="540" loading="lazy">
+      <img src="book.jpg" alt="Cover of The Deal by Elle Kennedy" width="666" height="1000" loading="lazy">
+    </figure>
+  </aside>`;
 
 // role: "champ" for Dan's opponent, "lucky" for Dan.
 function teamBlock(team, pts, ahead, outlook, role) {
@@ -482,7 +499,7 @@ async function init() {
   app.innerHTML = `
     <div class="scorewrap">
       <section id="scoreboard"><p class="status">Loading matchup…</p></section>
-      ${ENEMY_HTML}
+      ${GALLERY_HTML}
     </div>
     <div class="weekbar"><select id="week" aria-label="Week">${weekOptions}</select></div>
     <section id="lineups" hidden></section>

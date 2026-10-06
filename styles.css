@@ -8,6 +8,7 @@
   --good: #22c55e;
   --bad: #f87171;
   --gold: #fbbf24;
+  --sky: #7dd3fc;
   color-scheme: dark;
 }
 
@@ -22,6 +23,7 @@
   --good: #16a34a;
   --bad: #dc2626;
   --gold: #d97706;
+  --sky: #0284c7;
   color-scheme: light;
 }
 
@@ -135,23 +137,31 @@ section {
 }
 
 .scorewrap { position: relative; }
+.gallery { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
 .enemy {
-  margin: 0 auto 16px;
+  width: 100%;
   max-width: 280px;
+  margin: 0 auto;
   padding: 16px;
   border-radius: 12px;
   background: var(--card);
   text-align: center;
 }
-/* Wide screens: move it into the empty space to the left of the scoreboard. */
+/* Tablets / small laptops: side by side under the scoreboard. */
+@media (min-width: 600px) and (max-width: 1199px) {
+  .gallery { flex-direction: row; justify-content: center; align-items: flex-start; }
+  .enemy { margin: 0; }
+}
+/* Wide screens: move the pictures into the empty space to the left of the scoreboard. */
 @media (min-width: 1200px) {
-  .enemy {
+  .gallery {
     position: absolute;
     top: 0;
-    right: calc(100% + 24px);
     width: min(260px, calc((100vw - 760px) / 2 - 32px));
     margin: 0;
   }
+  .gallery.left { right: calc(100% + 24px); }
+  .gallery.right { left: calc(100% + 24px); }
 }
 .enemy figcaption {
   margin-bottom: 8px;
@@ -161,6 +171,9 @@ section {
   letter-spacing: .06em;
   text-transform: uppercase;
 }
+.enemy.goal figcaption { color: var(--good); }
+.enemy.punish figcaption { color: var(--sky); }
+.enemy img + img { margin-top: 12px; }
 .enemy img {
   display: block;
   width: 100%;
@@ -323,3 +336,5 @@ footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 8p
 
   .history button { grid-template-columns: 44px 1fr auto; font-size: .85rem; padding: 10px 2px; }
 }
+.enemy.goal img { border-color: color-mix(in srgb, var(--good) 60%, transparent); }
+.enemy.punish img { border-color: color-mix(in srgb, var(--sky) 60%, transparent); }
