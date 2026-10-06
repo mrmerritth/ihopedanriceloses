@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I Hope Dan Rice Loses</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --good: #22c55e;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+    }
+    h1 { margin: 0 0 8px; font-size: 2rem; }
+    p { color: var(--muted); margin: 0 0 24px; }
+    dl {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px 16px;
+      text-align: left;
+      margin: 0;
+    }
+    dt { color: var(--muted); }
+    dd { margin: 0; word-break: break-all; }
+    .good { color: var(--good); }
+    .warn { color: var(--warn); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>I Hope Dan Rice Loses</h1>
+    <p>If you can read this from somewhere other than localhost, it worked.</p>
+    <dl>
+      <dt>Host</dt>     <dd id="host"></dd>
+      <dt>Protocol</dt> <dd id="protocol"></dd>
+      <dt>Loaded</dt>   <dd id="loaded"></dd>
+    </dl>
+  </main>
+
+  <script>
+    const { hostname, protocol } = window.location;
+    const isLocal = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "";
+    const isHttps = protocol === "https:";
+
+    document.getElementById("host").textContent =
+      (hostname || "(opened as a file)") + (isLocal ? " — local" : " — live on the internet");
+
+    const protoEl = document.getElementById("protocol");
+    protoEl.textContent = isHttps ? "HTTPS 🔒 (certificate working)" : protocol.replace(":", "").toUpperCase() + " (no certificate)";
+    protoEl.className = isHttps ? "good" : "warn";
+
+    document.getElementById("loaded").textContent = new Date().toLocaleString();
+  </script>
+</body>
+</html>
