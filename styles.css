@@ -9,6 +9,7 @@
   --bad: #f87171;
   --gold: #fbbf24;
   --sky: #7dd3fc;
+  --jets: #4fbf8a;
   color-scheme: dark;
 }
 
@@ -24,6 +25,7 @@
   --bad: #dc2626;
   --gold: #d97706;
   --sky: #0284c7;
+  --jets: #125740;
   color-scheme: light;
 }
 
@@ -76,7 +78,7 @@ section {
 .team img, .avatar-ph { display: block; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; background: var(--line); }
 .tname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .owner { color: var(--muted); font-size: .85rem; }
-.pts { font-size: clamp(1.75rem, 8vw, 2.5rem); font-weight: 800; font-variant-numeric: tabular-nums; }
+.pts { font-size: min(clamp(1.75rem, 8vw, 2.5rem), 24cqi); font-weight: 800; font-variant-numeric: tabular-nums; }
 .team.ahead .pts { color: var(--good); }
 .vs { color: var(--muted); align-self: center; }
 
@@ -137,6 +139,7 @@ section {
 }
 
 .scorewrap { position: relative; }
+.galleries { display: contents; }
 .gallery { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
 .enemy {
   width: 100%;
@@ -147,10 +150,22 @@ section {
   background: var(--card);
   text-align: center;
 }
-/* Tablets / small laptops: side by side under the scoreboard. */
-@media (min-width: 600px) and (max-width: 1199px) {
-  .gallery { flex-direction: row; justify-content: center; align-items: flex-start; }
-  .enemy { margin: 0; }
+/* Below desktop: two columns, the matchup and stats on the left and all the pictures on the right. */
+@media (max-width: 1199px) {
+  #app {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(104px, 30vw, 260px);
+    grid-template-rows: repeat(4, auto) 1fr; /* spare height goes to the last, empty row, not between sections */
+    column-gap: 12px;
+    align-items: start;
+  }
+  .scorewrap { display: contents; }
+  #app > *, #scoreboard { grid-column: 1; }
+  /* One stack of picture boxes; the Jets card goes last here (it's under Patrick on desktop). */
+  .galleries { display: flex; flex-direction: column; gap: 16px; grid-column: 2; grid-row: 1 / -1; }
+  .gallery { display: contents; }
+  .enemy.jets { order: 1; }
+  .enemy { max-width: none; }
 }
 /* Wide screens: move the pictures into the empty space to the left of the scoreboard. */
 @media (min-width: 1200px) {
@@ -335,6 +350,60 @@ footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 8p
   .bench { gap: 0 12px; }
 
   .history button { grid-template-columns: 44px 1fr auto; font-size: .85rem; padding: 10px 2px; }
+
+  /* Two columns on a phone leave the matchup ~230px wide, so tighten everything a notch. */
+  body { padding: 10px 8px; }
+  #app { column-gap: 8px; }
+  section { padding: 10px; }
+  .galleries { gap: 8px; }
+  .enemy { padding: 6px; border-radius: 8px; }
+  .enemy figcaption { margin-bottom: 4px; font-size: .55rem; letter-spacing: .02em; }
+  .enemy img + img { margin-top: 6px; }
+
+  .cheer { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px; }
+  .megaphone { width: 26px; height: 26px; }
+  .cheer-title { font-size: .9rem; }
+  .cheer-sub { font-size: .75rem; }
+  .headline { font-size: .95rem; }
+  .score { gap: 4px; }
+  .team img, .avatar-ph { width: 44px; height: 44px; }
+  .crown { width: 28px; }
+  .tname { font-size: .78rem; }
+  .owner, .proj { font-size: .65rem; }
+  .wp-labels { font-size: .65rem; }
+  .wp-labels span:nth-child(2) { display: none; }
+  .updated { font-size: .65rem; }
+
+  h2 { font-size: .8rem; }
+  .row { grid-template-columns: 1fr 22px 1fr; gap: 4px; }
+  .row.head { font-size: .6rem; }
+  .slot { font-size: .55rem; }
+  .player .name { font-size: .72rem; }
+  .player .meta { font-size: .6rem; }
+  .player .ppts { font-size: .72rem; }
+  .player .ppts small { font-size: .58rem; }
+  .bench { gap: 0 6px; }
+
+  .history button { grid-template-columns: 34px 1fr auto; font-size: .7rem; gap: 4px; }
 }
 .enemy.goal img { border-color: color-mix(in srgb, var(--good) 60%, transparent); }
 .enemy.punish img { border-color: color-mix(in srgb, var(--sky) 60%, transparent); }
+
+/* His favorite team */
+.enemy.jets figcaption { color: var(--jets); }
+.enemy img.jets-logo { width: 72px; margin: 4px auto 6px; border: 0; border-radius: 0; box-shadow: none; }
+.jets-record { margin: 0 0 10px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.jets-stats { display: grid; gap: 8px; margin: 0; }
+.jets-stats > div { display: flex; flex-direction: column; padding: 8px 6px; border-radius: 8px; background: color-mix(in srgb, var(--jets) 12%, transparent); }
+.jets-stats dd { margin: 0; font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text); }
+.jets-stats dt { color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; }
+.jets-stats dd:not(.when) { order: -1; } /* number first, label under it */
+.jets-stats dd.when { font-size: .7rem; font-weight: 400; color: var(--muted); }
+@media (max-width: 520px) {
+  .enemy img.jets-logo { width: 48px; }
+  .jets-record { font-size: .7rem; margin-bottom: 6px; }
+  .jets-stats { gap: 4px; }
+  .jets-stats > div { padding: 4px 3px; }
+  .jets-stats dd { font-size: .75rem; }
+  .jets-stats dt, .jets-stats dd.when { font-size: .5rem; letter-spacing: 0; }
+}

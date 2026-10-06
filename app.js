@@ -259,8 +259,54 @@ function cheerBanner(c) {
     </div>`;
 }
 
-// Picture columns that sit in the empty space either side of the scoreboard on wide screens, below it otherwise.
+// Dan's favorite team. The record is fetched live; these dates only change if the Jets ever win again.
+// Dates are the Jets' last games of each kind, from ESPN's results.
+const JETS_DROUGHTS = [
+  ["Since last playoff appearance", "2011-01-23"], // AFC Championship, L 19-24 at PIT
+  ["Since last playoff win", "2011-01-16"],        // Divisional round, W 28-21 at NE
+  ["Since last Super Bowl win", "1969-01-12"],     // Super Bowl III, W 16-7 vs BAL
+];
+
+function daysSince(isoDate) {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const now = new Date();
+  return Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(y, m - 1, d)) / 86400000);
+}
+
+function jetsHtml() {
+  const stats = JETS_DROUGHTS.map(([label, date]) => {
+    const when = new Date(date + "T12:00:00").toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
+    return `<div><dt>${label}</dt><dd>${daysSince(date).toLocaleString()} days</dd><dd class="when">${when}</dd></div>`;
+  }).join("");
+  return `
+    <figure class="enemy jets">
+      <figcaption>His favorite team</figcaption>
+      <img class="jets-logo" src="https://sleepercdn.com/images/team_logos/nfl/nyj.png" alt="New York Jets logo" width="200" height="200" loading="lazy">
+      <p class="jets-record" id="jets-record">–</p>
+      <dl class="jets-stats">${stats}</dl>
+    </figure>`;
+}
+
+// The Jets' current record, tallied from each finished week's scores.
+async function loadJetsRecord(season, throughWeek) {
+  const weeks = Array.from({ length: throughWeek }, (_, i) => i + 1);
+  const results = await Promise.all(weeks.map(w => api(`/scores/nfl/regular/${season}/${w}`, APP_API).catch(() => [])));
+  let wins = 0, losses = 0, ties = 0;
+  for (const games of results) {
+    const g = games.find(g => g.status === "complete" && [g.metadata?.home_team, g.metadata?.away_team].includes("NYJ"));
+    if (!g) continue; // bye week, or not played yet
+    const m = g.metadata;
+    const [us, them] = m.home_team === "NYJ" ? [m.home_score, m.away_score] : [m.away_score, m.home_score];
+    if (us > them) wins++;
+    else if (us < them) losses++;
+    else ties++;
+  }
+  document.getElementById("jets-record").textContent = `${season} record: ${wins}-${losses}${ties ? `-${ties}` : ""}`;
+}
+
+// Picture columns: either side of the scoreboard on wide screens; one column beside the matchup otherwise.
 const GALLERY_HTML = `
+  <div class="galleries">
   <aside class="gallery left">
     <figure class="enemy">
       <figcaption>Mr Never had an injury himself</figcaption>
@@ -270,6 +316,7 @@ const GALLERY_HTML = `
       <figcaption>Also an enemy of the league</figcaption>
       <img src="patrick-gm.jpg" alt="Patrick Siegmund, General Manager of the St. Louis Stallions" width="1122" height="1402" loading="lazy">
     </figure>
+    ${jetsHtml()}
   </aside>
   <aside class="gallery right">
     <figure class="enemy goal">
@@ -281,7 +328,8 @@ const GALLERY_HTML = `
       <img src="floormat-web.jpg" alt="Doormat reading I suck at fantasy football" width="900" height="540" loading="lazy">
       <img src="book.jpg" alt="Cover of The Deal by Elle Kennedy" width="666" height="1000" loading="lazy">
     </figure>
-  </aside>`;
+  </aside>
+  </div>`;
 
 // role: "champ" for Dan's opponent, "lucky" for Dan.
 function teamBlock(team, pts, ahead, outlook, role) {
@@ -514,6 +562,7 @@ async function init() {
 
   await renderWeek(ctx);
   loadHistory(ctx);
+  loadJetsRecord(nfl.season, Math.max(nfl.week, 1)).catch(() => {}); // extra; the box still shows the droughts without it
 
   // Keep the live week's score fresh while the tab is visible.
   const refresh = () => {
